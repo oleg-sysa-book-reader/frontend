@@ -111,7 +111,10 @@ export const addWordToLearning = async (word: string) => {
 
     const response = await apiFetch(ENDPOINTS.learnWord(), {
         method: "POST",
-        body: word,
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(word),
         credentials: "include"
     });
 
