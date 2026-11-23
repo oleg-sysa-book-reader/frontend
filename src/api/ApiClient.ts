@@ -141,3 +141,41 @@ export async function getUserVocabulary(
 
     return await response.json();
 }
+
+export async function exportUserVocabulary(): Promise<void> {
+    const response = await apiFetch(ENDPOINTS.exportUserVocabulary());
+
+    if (!response.ok) {
+        throw new Error("Failed to export vocabulary");
+    }
+
+    const blob = await response.blob();
+    const contentDisposition = response.headers.get("content-disposition");
+    const fileNameMatch = contentDisposition?.match(/filename\*?=(?:UTF-8''|"?)([^";]+)/i);
+    const fileName = fileNameMatch?.[1]
+        ? decodeURIComponent(fileNameMatch[1])
+        : "vocabulary-export";
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+}
+
+export async function importUserVocabulary(file: File): Promise<void> {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await apiFetch(ENDPOINTS.importUserVocabulary(), {
+        method: "POST",
+        body: formData
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to import vocabulary");
+    }
+}

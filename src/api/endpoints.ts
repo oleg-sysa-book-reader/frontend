@@ -28,5 +28,9 @@ export const ENDPOINTS = {
         `${API_BASE}/Learning`,
     getUserVocabulary: (pageNumber: number, pageSize: number) =>
         `${API_BASE}/Learning?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+    exportUserVocabulary: () =>
+        `${API_BASE}/Learning/export`,
+    importUserVocabulary: () =>
+        `${API_BASE}/Learning/import`,
 
 };

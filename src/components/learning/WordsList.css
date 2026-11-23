@@ -156,3 +156,88 @@
     color: white;
     border-color: #5ba6cc;
 }
+/* Import modal */
+
+.import-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.import-modal {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border: 1px solid #cfe3ef;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.import-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.import-modal-header h3 {
+    margin: 0;
+    color: #24485c;
+    font-size: 18px;
+}
+
+.import-modal-close {
+    border: none;
+    background: transparent;
+    color: #31576b;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.import-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.import-modal-form label {
+    color: #31576b;
+    font-size: 14px;
+}
+
+.import-modal-form input[type="file"] {
+    color: #31576b;
+}
+
+.import-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.import-modal-actions button {
+    padding: 8px 14px;
+    border: 1px solid #cfe3ef;
+    border-radius: 6px;
+    background: white;
+    color: #31576b;
+    cursor: pointer;
+}
+
+.import-modal-actions button[type="submit"] {
+    background: #5ba6cc;
+    border-color: #5ba6cc;
+    color: white;
+}
+
+.import-modal-actions button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}

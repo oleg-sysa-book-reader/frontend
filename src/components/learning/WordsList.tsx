@@ -1,6 +1,6 @@
 import type { Word } from "../../api/models/word";
-import { useEffect, useState } from "react";
-import { getUserVocabulary } from "../../api/ApiClient";
+import { useCallback, useEffect, useState } from "react";
+import { exportUserVocabulary, getUserVocabulary, importUserVocabulary } from "../../api/ApiClient";
 import "./WordsList.css";
 import { Download, Upload, Trash } from "lucide-react";
 
@@ -12,41 +12,48 @@ export default function WordsList() {
     const [pageNumber, setPageNumber] = useState(DEFAULT_PAGE_NUMBER);
     const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
     const [totalPages, setTotalPages] = useState(1);
+    const [isImportOpen, setIsImportOpen] = useState(false);
+    const [importFile, setImportFile] = useState<File | null>(null);
+    const [isImporting, setIsImporting] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
 
-    useEffect(() => {
-        const loadWords = async () => {
-            try {
-                const response = await getUserVocabulary(pageNumber, pageSize);
+    const loadWords = useCallback(async () => {
+        try {
+            const response = await getUserVocabulary(pageNumber, pageSize);
 
-                if (response.success) {
-                    const res = response.data as unknown as {
-                        data?: Word[];
-                        totalPages?: number;
-                        totalCount?: number;
-                    };
+            if (response.success) {
+                const res = response.data as unknown as {
+                    items?: Word[];
+                    data?: Word[];
+                    totalPages?: number;
+                    totalCount?: number;
+                };
 
-                    const items = Array.isArray(res?.data)
+                const items = Array.isArray(res?.items)
+                    ? res.items
+                    : Array.isArray(res?.data)
                         ? res.data
                         : Array.isArray(response.data)
                             ? (response.data as unknown as Word[])
                             : [];
 
-                    const totalCount = typeof res?.totalCount === "number" ? res.totalCount : items.length;
-                    const calculatedTotalPages =
-                        typeof res?.totalPages === "number"
-                            ? res.totalPages
-                            : Math.ceil(totalCount / pageSize);
+                const totalCount = typeof res?.totalCount === "number" ? res.totalCount : items.length;
+                const calculatedTotalPages =
+                    typeof res?.totalPages === "number"
+                        ? res.totalPages
+                        : Math.ceil(totalCount / pageSize);
 
-                    setWords(items);
-                    setTotalPages(Math.max(1, calculatedTotalPages || 1));
-                }
-            } catch (error) {
-                console.error(error);
+                setWords(items);
+                setTotalPages(Math.max(1, calculatedTotalPages || 1));
             }
-        };
-
-        loadWords();
+        } catch (error) {
+            console.error(error);
+        }
     }, [pageNumber, pageSize]);
+
+    useEffect(() => {
+        void loadWords();
+    }, [loadWords]);
 
     const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setPageSize(Number(event.target.value));
@@ -71,14 +78,59 @@ export default function WordsList() {
         return pages;
     };
 
+    const handleExport = async () => {
+        try {
+            setIsExporting(true);
+            await exportUserVocabulary();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
+    const handleImportOpen = () => {
+        setIsImportOpen(true);
+        setImportFile(null);
+    };
+
+    const handleImportClose = () => {
+        if (isImporting) {
+            return;
+        }
+
+        setIsImportOpen(false);
+        setImportFile(null);
+    };
+
+    const handleImportSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        if (!importFile) {
+            return;
+        }
+
+        try {
+            setIsImporting(true);
+            await importUserVocabulary(importFile);
+            setIsImportOpen(false);
+            setImportFile(null);
+            await loadWords();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsImporting(false);
+        }
+    };
+
     return (
         <div>
             <div className="words-toolbar">
-                <button title="Import">
+                <button title="Import" onClick={handleImportOpen}>
                     <Upload size={18} />
                 </button>
 
-                <button title="Export">
+                <button title="Export" onClick={handleExport} disabled={isExporting}>
                     <Download size={18} />
                 </button>
             </div>
@@ -138,6 +190,37 @@ export default function WordsList() {
                     </select>
                 </div>
             </div>
+
+            {isImportOpen && (
+                <div className="import-modal-overlay" onClick={handleImportClose}>
+                    <div className="import-modal" onClick={(event) => event.stopPropagation()}>
+                        <div className="import-modal-header">
+                            <h3>Import vocabulary</h3>
+                            <button type="button" className="import-modal-close" onClick={handleImportClose}>
+                                ×
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleImportSubmit} className="import-modal-form">
+                            <label htmlFor="importVocabularyFile">Choose file</label>
+                            <input
+                                id="importVocabularyFile"
+                                type="file"
+                                onChange={(event) => setImportFile(event.target.files?.[0] ?? null)}
+                            />
+
+                            <div className="import-modal-actions">
+                                <button type="button" onClick={handleImportClose} disabled={isImporting}>
+                                    Cancel
+                                </button>
+                                <button type="submit" disabled={!importFile || isImporting}>
+                                    {isImporting ? "Sending..." : "Send"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
