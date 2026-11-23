@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+﻿const API_BASE = import.meta.env.VITE_API_BASE_URL;
 const NOTIFY_BASE = import.meta.env.VITE_NOTIFICATION_BASE_URL;
 export const ENDPOINTS = {
     books: `${API_BASE}/books`,
@@ -26,7 +26,7 @@ export const ENDPOINTS = {
         `${API_BASE}/book?bookId=${id}`,
     learnWord: () =>
         `${API_BASE}/Learning`,
-    getUserVocabulary: () =>
-        `${API_BASE}/Learning`,
+    getUserVocabulary: (pageNumber: number, pageSize: number) =>
+        `${API_BASE}/Learning?pageNumber=${pageNumber}&pageSize=${pageSize}`,
 
 };

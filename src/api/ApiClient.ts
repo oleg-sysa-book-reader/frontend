@@ -1,6 +1,7 @@
-import { ENDPOINTS } from "./endpoints";
+﻿import { ENDPOINTS } from "./endpoints";
 import type { BookModel } from "./models/book";
 import type { Word } from "./models/word";
+import type { PagedResult } from "./models/paged-result";
 import type { PageContent } from "./models/page-content";
 import type { ApiResponse } from "./models/http";
 
@@ -115,14 +116,7 @@ export const addWordToLearning = async (value: string) => {
             "Content-Type": "application/json"
         },
         method: "POST",
-<<<<<<< HEAD
         body: JSON.stringify(value),
-=======
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(word),
->>>>>>> main
         credentials: "include"
     });
 
@@ -133,9 +127,13 @@ export const addWordToLearning = async (value: string) => {
     return response.json();
 };
 
-export async function getUserVocabulary(): Promise<ApiResponse<Word[]>> {
+export async function getUserVocabulary(
+    pageNumber: number = 1,
+    pageSize: number = 10
+): Promise<ApiResponse<PagedResult<Word>>> {
     const response = await apiFetch(
-        ENDPOINTS.getUserVocabulary());
+        ENDPOINTS.getUserVocabulary(pageNumber, pageSize)
+    );
 
     if (!response.ok) {
         throw new Error("Failed to load user vocabulary");
