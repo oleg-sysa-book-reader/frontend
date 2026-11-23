@@ -115,7 +115,14 @@ export const addWordToLearning = async (value: string) => {
             "Content-Type": "application/json"
         },
         method: "POST",
+<<<<<<< HEAD
         body: JSON.stringify(value),
+=======
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(word),
+>>>>>>> main
         credentials: "include"
     });
 
