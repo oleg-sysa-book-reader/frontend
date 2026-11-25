@@ -1,6 +1,6 @@
 .words-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 2fr 120px;
+    grid-template-columns: 48px 1fr 1fr 2fr 120px;
     width: 100%;
     border: 1px solid #cfe3ef;
     border-radius: 10px;
@@ -26,16 +26,16 @@
 
 /* Alternating rows */
 .word-row.odd>div {
-    background: #ffffff;
+    background: #f4faff;
 }
 
 .word-row.even>div {
-    background: #f0f7fc;
+    background: #e8f3fb;
 }
 
 /* Hover */
 .word-row:hover>div {
-    background: #e2f1fb;
+    background: #dceef9;
 }
 
 
@@ -64,9 +64,30 @@
 
 .words-toolbar {
     display: flex;
-    justify-content: flex-end;
-    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     margin-bottom: 16px;
+}
+
+.words-toolbar-group,
+.bulk-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.words-toolbar-group {
+    margin-left: auto;
+}
+
+.bulk-actions {
+    min-height: 38px;
+    color: #31576b;
+}
+
+.bulk-actions-count {
+    font-size: 14px;
 }
 
 .words-toolbar button {
@@ -90,6 +111,20 @@
 .words-toolbar button:hover {
     background: #e6f2fa;
     border-color: #a9cddd;
+}
+
+.grid-header-checkbox,
+.grid-cell-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.grid-header-checkbox input,
+.grid-cell-checkbox input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
 }
 
 

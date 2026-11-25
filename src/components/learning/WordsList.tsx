@@ -16,6 +16,7 @@ export default function WordsList() {
     const [importFile, setImportFile] = useState<File | null>(null);
     const [isImporting, setIsImporting] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
+    const [selectedWordIds, setSelectedWordIds] = useState<number[]>([]);
 
     const loadWords = useCallback(async () => {
         try {
@@ -44,6 +45,7 @@ export default function WordsList() {
                         : Math.ceil(totalCount / pageSize);
 
                 setWords(items);
+                setSelectedWordIds([]);
                 setTotalPages(Math.max(1, calculatedTotalPages || 1));
             }
         } catch (error) {
@@ -58,6 +60,26 @@ export default function WordsList() {
     const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setPageSize(Number(event.target.value));
         setPageNumber(DEFAULT_PAGE_NUMBER);
+    };
+
+    const allVisibleSelected = words.length > 0 && words.every((word) => selectedWordIds.includes(word.id));
+    const someVisibleSelected = words.some((word) => selectedWordIds.includes(word.id));
+
+    const handleToggleSelectAll = () => {
+        if (allVisibleSelected) {
+            setSelectedWordIds([]);
+            return;
+        }
+
+        setSelectedWordIds(words.map((word) => word.id));
+    };
+
+    const handleToggleWordSelection = (wordId: number) => {
+        setSelectedWordIds((currentSelectedIds) =>
+            currentSelectedIds.includes(wordId)
+                ? currentSelectedIds.filter((id) => id !== wordId)
+                : [...currentSelectedIds, wordId]
+        );
     };
 
     const getPageNumbers = () => {
@@ -126,22 +148,56 @@ export default function WordsList() {
     return (
         <div>
             <div className="words-toolbar">
-                <button title="Import" onClick={handleImportOpen}>
-                    <Upload size={18} />
-                </button>
+                <div className="bulk-actions" aria-label="Bulk actions">
+                    {selectedWordIds.length > 0 && (
+                        <>
+                            <span className="bulk-actions-count">Selected: {selectedWordIds.length}</span>
+                            <button type="button" title="Delete selected">
+                                <Trash size={18} />
+                            </button>
+                        </>
+                    )}
+                </div>
 
-                <button title="Export" onClick={handleExport} disabled={isExporting}>
-                    <Download size={18} />
-                </button>
+                <div className="words-toolbar-group">
+                    <button title="Import" onClick={handleImportOpen}>
+                        <Upload size={18} />
+                    </button>
+
+                    <button title="Export" onClick={handleExport} disabled={isExporting}>
+                        <Download size={18} />
+                    </button>
+                </div>
             </div>
             <div className="words-grid">
+                <div className="grid-header grid-header-checkbox">
+                    <input
+                        type="checkbox"
+                        aria-label="Select all words on page"
+                        checked={allVisibleSelected}
+                        ref={(element) => {
+                            if (element) {
+                                element.indeterminate = !allVisibleSelected && someVisibleSelected;
+                            }
+                        }}
+                        onChange={handleToggleSelectAll}
+                    />
+                </div>
                 <div className="grid-header">Word</div>
                 <div className="grid-header">Translation</div>
                 <div className="grid-header">Example</div>
                 <div className="grid-header">Actions</div>
 
-                {words.map((word) => (
-                    <div className="word-row" key={word.id}>
+                {words.map((word, index) => (
+                    <div className={`word-row ${index % 2 === 0 ? "even" : "odd"}`} key={word.id}>
+                        <div className="grid-cell-checkbox">
+                            <input
+                                type="checkbox"
+                                aria-label={`Select word ${word.sourceValue}`}
+                                checked={selectedWordIds.includes(word.id)}
+                                onChange={() => handleToggleWordSelection(word.id)}
+                            />
+                        </div>
                         <div>{word.sourceValue}</div>
                         <div>{word.translation}</div>
                         <div>{word.example}</div>
