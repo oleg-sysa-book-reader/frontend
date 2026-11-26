@@ -1,17 +1,15 @@
 import { useEffect, useState } from "react";
 import { getAllUserBooks } from "../../api/ApiClient";
 import type { BookModel } from "../../api/models/book";
+import { NOTIFICATION_TYPES, useNotification } from "../../hooks/useNotifications";
 import "./BooksPage.css"
 import AddBookModal from "./AddBookModal"
-import { useOutletContext } from "react-router-dom";
 import BookCard from "./BookCard";
 
 export default function BooksPage() {
     const [books, setBooks] = useState<BookModel[]>([]);
     const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false);
-    const { bookStatuses } = useOutletContext<{
-        bookStatuses: Record<number, number>;
-    }>();
+    const bookStatuses = useNotification<Record<number, number>>(NOTIFICATION_TYPES.bookStatus) ?? {};
     const loadBooks = async () => {
         try {
             const response = await getAllUserBooks();

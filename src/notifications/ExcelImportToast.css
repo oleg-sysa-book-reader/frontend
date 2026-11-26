@@ -1,0 +1,59 @@
+.excel-import-toast {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: min(360px, calc(100vw - 32px));
+    padding: 12px 14px;
+    border: 1px solid #34d399;
+    border-radius: 8px;
+    background: #a7f3d0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
+    color: #064e3b;
+    font-size: 14px;
+    animation: excel-import-toast-enter 180ms ease-out both;
+}
+
+.excel-import-toast-error {
+    border-color: #ef4444;
+    background: #fecaca;
+    color: #7f1d1d;
+}
+
+.excel-import-toast-leaving {
+    animation: excel-import-toast-exit 300ms ease-in both;
+}
+
+@keyframes excel-import-toast-enter {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes excel-import-toast-exit {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .excel-import-toast,
+    .excel-import-toast-leaving {
+        animation-duration: 1ms;
+    }
+}

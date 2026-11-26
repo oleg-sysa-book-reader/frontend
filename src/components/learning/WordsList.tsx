@@ -1,6 +1,11 @@
 import type { Word } from "../../api/models/word";
 import { useCallback, useEffect, useState } from "react";
 import { deleteWordFromVocabulary, exportUserVocabulary, getUserVocabulary, importUserVocabulary } from "../../api/ApiClient";
+import { NOTIFICATION_TYPES, useNotification } from "../../hooks/useNotifications";
+import {
+    EXCEL_IMPORT_STATUS,
+    type ImportNotification
+} from "../../notifications/handlers/vocabularyImportHandler";
 import "./WordsList.css";
 import { Download, Upload, Trash } from "lucide-react";
 
@@ -8,6 +13,7 @@ const DEFAULT_PAGE_NUMBER = 1;
 const DEFAULT_PAGE_SIZE = 10;
 
 export default function WordsList() {
+    const importNotification = useNotification<ImportNotification>(NOTIFICATION_TYPES.vocabularyImport);
     const [words, setWords] = useState<Word[]>([]);
     const [pageNumber, setPageNumber] = useState(DEFAULT_PAGE_NUMBER);
     const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
@@ -56,6 +62,17 @@ export default function WordsList() {
     useEffect(() => {
         void loadWords();
     }, [loadWords]);
+
+    useEffect(() => {
+        if (!importNotification?.status) {
+            return;
+        }
+
+        const status = Number(importNotification.status);
+        if (status === EXCEL_IMPORT_STATUS.success || status === EXCEL_IMPORT_STATUS.error) {
+            void loadWords();
+        }
+    }, [importNotification, loadWords]);
 
     const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setPageSize(Number(event.target.value));
