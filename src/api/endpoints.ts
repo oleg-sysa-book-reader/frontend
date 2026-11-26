@@ -32,5 +32,7 @@ export const ENDPOINTS = {
         `${API_BASE}/Learning/export`,
     importUserVocabulary: () =>
         `${API_BASE}/Learning/import`,
+    deleteWordFromVocabulary: (wordId: number) =>
+        `${API_BASE}/Learning/${wordId}`,
 
 };

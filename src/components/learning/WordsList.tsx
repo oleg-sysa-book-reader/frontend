@@ -1,6 +1,6 @@
 import type { Word } from "../../api/models/word";
 import { useCallback, useEffect, useState } from "react";
-import { exportUserVocabulary, getUserVocabulary, importUserVocabulary } from "../../api/ApiClient";
+import { deleteWordFromVocabulary, exportUserVocabulary, getUserVocabulary, importUserVocabulary } from "../../api/ApiClient";
 import "./WordsList.css";
 import { Download, Upload, Trash } from "lucide-react";
 
@@ -145,6 +145,23 @@ export default function WordsList() {
         }
     };
 
+    const handleDeleteWord = async (wordId: number) => {
+        try {
+            const response = await deleteWordFromVocabulary(wordId);
+
+            if (response.success) {
+                if (words.length === 1 && pageNumber > 1) {
+                    setPageNumber((currentPage) => currentPage - 1);
+                    return;
+                }
+
+                await loadWords();
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <div>
             <div className="words-toolbar">
@@ -202,7 +219,7 @@ export default function WordsList() {
                         <div>{word.translation}</div>
                         <div>{word.example}</div>
                         <div className="actions">
-                            <button>
+                            <button type="button" title="Delete word" onClick={() => void handleDeleteWord(word.id)}>
                                 <Trash size={14} />
                             </button>
                         </div>

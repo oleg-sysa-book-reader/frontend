@@ -179,3 +179,15 @@ export async function importUserVocabulary(file: File): Promise<void> {
         throw new Error("Failed to import vocabulary");
     }
 }
+
+export async function deleteWordFromVocabulary(wordId: number): Promise<ApiResponse<boolean>> {
+    const response = await apiFetch(ENDPOINTS.deleteWordFromVocabulary(wordId), {
+        method: "DELETE"
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to delete word");
+    }
+
+    return await response.json();
+}
